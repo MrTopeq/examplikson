@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Zarąbista Jednoplikowa Strona</title>
+  <meta name="color-scheme" content="light dark" />
+  <style>
+    :root {
+      --bg: #0b0f14;
+      --bg-2: #0f1520;
+      --text: #e6ecf1;
+      --muted: #a6b0bb;
+      --primary: #6ae3ff;
+      --accent: #7c5cff;
+      --warn: #ffb454;
+      --ok: #6fff9f;
+      --card: rgba(255,255,255,0.06);
+      --card-border: rgba(255,255,255,0.12);
+      --shadow: 0 10px 30px rgba(0,0,0,0.4);
+      --radius: 16px;
+      --grid-g: 20px;
+    }
+
+    /* Light theme tokens (auto-switched via [data-theme="light"]) */
+    :root[data-theme="light"] {
+      --bg: #f6f8fb;
+      --bg-2: #ffffff;
+      --text: #0c1220;
+      --muted: #4b5565;
+      --primary: #007aff;
+      --accent: #6b4eff;
+      --warn: #e08b00;
+      --ok: #0fac66;
+      --card: rgba(0,0,0,0.04);
+      --card-border: rgba(0,0,0,0.08);
+      --shadow: 0 10px 30px rgba(0,0,0,0.12);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+      color: var(--text);
+      background: radial-gradient(1200px 800px at 10% -10%, rgba(124,92,255,0.25), transparent 60%),
+                  radial-gradient(900px 700px at 80% 120%, rgba(106,227,255,0.20), transparent 60%),
+                  linear-gradient(180deg, var(--bg), var(--bg-2));
+      overflow-x: hidden;
+    }
+
+    .wrap {
+      width: min(1200px, 92vw);
+      margin: 0 auto;
+    }
+
+    header.nav {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: saturate(140%) blur(12px);
+      background: linear-gradient(180deg, rgba(0,0,0,0.35), rgba(0,0,0,0.0));
+      border-bottom: 1px solid var(--card-border);
+    }
+    .nav .inner {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 0;
+    }
+    .brand {
+      display: flex; align-items: center; gap: 10px;
+      letter-spacing: 0.5px; font-weight: 700;
+    }
+    .logo {
+      width: 28px; height: 28px; border-radius: 8px;
+      background: conic-gradient(from 210deg, var(--accent), var(--primary), var(--ok), var(--warn), var(--accent));
+      box-shadow: 0 0 24px rgba(124,92,255,0.35);
+    }
+    nav a {
+      color: var(--text); text-decoration: none; opacity: 0.9;
+      padding: 8px 12px; border-radius: 10px; transition: 180ms ease;
+    }
+    nav a:hover { background: var(--card); opacity: 1; }
+
+    .actions { display: flex; align-items: center; gap: 10px; }
+    .btn {
+      appearance: none; border: 1px solid var(--card-border); background: var(--card);
+      color: var(--text); padding: 10px 14px; border-radius: 12px;
+      cursor: pointer; transition: 180ms ease; box-shadow: var(--shadow);
+    }
+    .btn:hover { transform: translateY(-1px); border-color: rgba(255,255,255,0.22); }
+    .btn.primary {
+      background: linear-gradient(135deg, var(--accent), var(--primary));
+      border: none; color: #0b0f14; font-weight: 700;
+      box-shadow: 0 8px 24px rgba(124,92,255,0.35), 0 6px 18px rgba(0,0,0,0.25);
+    }
+    .btn.ghost { background: transparent; border-color: var(--card-border); }
+
+    /* Hero */
+    .hero {
+      position: relative; padding: min(14vh, 120px) 0 min(10vh, 80px);
+    }
+    #bg {
+      position: absolute; inset: 0; z-index: -1; opacity: 0.35;
+    }
+    .hero .grid {
+      display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 26px; align-items: center;
+    }
+    @media (max-width: 900px) {
+      .hero .grid { grid-template-columns: 1fr; }
+    }
+    .kicker {
+      display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px;
+      border: 1px solid var(--card-border); background: var(--card); border-radius: 999px;
+      font-size: 13px; color: var(--muted);
+    }
+    .pulse {
+      width: 8px; height: 8px; border-radius: 999px; background: var(--ok);
+      box-shadow: 0 0 0 0 rgba(111,255,159,0.7);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(111,255,159,0.7); }
+      70% { box-shadow: 0 0 0 16px rgba(111,255,159,0); }
+      100% { box-shadow: 0 0 0 0 rgba(111,255,159,0); }
+    }
+
+    h1.title {
+      margin: 16px 0 10px; font-size: clamp(28px, 5vw, 52px); line-height: 1.05;
+      background: linear-gradient(120deg, var(--text), var(--primary), var(--accent), var(--text));
+      background-size: 300% 100%;
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+      animation: shine 8s linear infinite;
+    }
+    @keyframes shine { 0% { background-position: 0% 50%; } 100% { background-position: 300% 50%; } }
+
+    .typed {
+      font-size: clamp(16px, 2.4vw, 20px);
+      color: var(--muted); min-height: 28px; position: relative; padding-right: 10px;
+    }
+    .typed::after {
+      content: ""; position: absolute; right: 0; top: 0; bottom: 0; width: 2px;
+      background: var(--text); animation: caret 0.9s steps(1) infinite;
+    }
+    @keyframes caret { 50% { opacity: 0; } }
+
+    .cta { margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap; }
+
+    .panel {
+      width: 100%; aspect-ratio: 16 / 10; border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+      border: 1px solid var(--card-border); position: relative; overflow: hidden;
+      transform-style: preserve-3d; perspective: 800px;
+      box-shadow: var(--shadow);
+    }
+    .panel .glow {
+      position: absolute; inset: -20%; background: radial-gradient(400px 200px at var(--mx,50%) var(--my,50%), rgba(124,92,255,0.35), transparent 60%);
+      pointer-events: none; transition: 80ms linear;
+    }
+    .panel .decor {
+      position: absolute; inset: 0; opacity: 0.12; background:
+        repeating-linear-gradient( to bottom right, transparent 0 10px, currentColor 10px 11px );
+      mix-blend-mode: overlay;
+    }
+
+    /* Sections */
+    section { padding: 60px 0; }
+    .section-title {
+      font-size: clamp(22px, 3vw, 32px); margin: 0 0 16px;
+    }
+    .section-desc { color: var(--muted); margin: 0 0 26px; }
+
+    .features {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--grid-g);
+    }
+    @media (max-width: 900px) { .features { grid-template-columns: 1fr; } }
+    .card {
+      background: var(--card); border: 1px solid var(--card-border);
+      border-radius: var(--radius); padding: 18px; box-shadow: var(--shadow);
+      transform: translateY(0); transition: 220ms ease;
+      opacity: 0; translate: 0 8px; filter: blur(6px);
+    }
+    .card.in { opacity: 1; translate: 0 0; filter: blur(0); }
+    .card:hover { transform: translateY(-4px); }
+    .badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 6px 10px; border-radius: 999px; font-size: 12px; color: #0b0f14; font-weight: 700;
+      background: linear-gradient(135deg, var(--accent), var(--primary));
+      box-shadow: 0 8px 24px rgba(106,227,255,0.28);
+    }
+
+    .grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--grid-g);
+    }
+    @media (max-width: 1000px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 640px) { .grid { grid-template-columns: 1fr; } }
+
+    .proj {
+      background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+      border: 1px solid var(--card-border); border-radius: var(--radius);
+      padding: 16px; position: relative; overflow: hidden;
+      transform-style: preserve-3d; perspective: 700px; box-shadow: var(--shadow);
+      transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateZ(0);
+      transition: transform 120ms linear, border-color 200ms ease;
+    }
+    .proj:hover { border-color: rgba(255,255,255,0.2); }
+    .proj h4 { margin: 8px 0 8px; }
+    .tags { display: flex; gap: 8px; flex-wrap: wrap; }
+    .tag {
+      font-size: 12px; color: var(--muted); border: 1px solid var(--card-border);
+      padding: 4px 8px; border-radius: 999px; background: rgba(255,255,255,0.03);
+    }
+
+    .about {
+      display: grid; grid-template-columns: 1fr 1fr; gap: var(--grid-g);
+    }
+    @media (max-width: 900px) { .about { grid-template-columns: 1fr; } }
+
+    .contact form {
+      display: grid; grid-template-columns: 1fr 1fr; gap: var(--grid-g);
+      background: var(--card); border: 1px solid var(--card-border); border-radius: var(--radius);
+      padding: 18px; box-shadow: var(--shadow);
+    }
+    .contact form .row { display: contents; }
+    .contact label { font-size: 14px; color: var(--muted); }
+    .contact input, .contact textarea {
+      width: 100%; margin-top: 6px; padding: 12px 12px; border-radius: 12px;
+      border: 1px solid var(--card-border); color: var(--text); background: rgba(0,0,0,0.2);
+      outline: none; transition: 180ms ease;
+    }
+    :root[data-theme="light"] .contact input,
+    :root[data-theme="light"] .contact textarea {
+      background: rgba(255,255,255,0.7);
+    }
+    .contact input:focus, .contact textarea:focus { border-color: rgba(124,92,255,0.5); box-shadow: 0 0 0 4px rgba(124,92,255,0.15); }
+    .contact textarea { grid-column: 1 / -1; min-height: 120px; resize: vertical; }
+    .contact .send { grid-column: 1 / -1; justify-self: start; }
+
+    footer {
+      padding: 36px 0 48px; color: var(--muted);
+      border-top: 1px solid var(--card-border);
+      backdrop-filter: blur(8px) saturate(140%);
+      background: linear-gradient(0deg, rgba(0,0,0,0.10), rgba(0,0,0,0.0));
+    }
+
+    /* Smooth anchor offset for sticky header */
+    :target { scroll-margin-top: 80px; }
+  </style>
+</head>
+<body>
+  <canvas id="bg" aria-hidden="true"></canvas>
+
+  <header class="nav" role="navigation" aria-label="Główna nawigacja">
+    <div class="wrap inner">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <span>OneFile Pro</span>
+      </div>
+      <nav>
+        <a href="#start">Start</a>
+        <a href="#funkcje">Funkcje</a>
+        <a href="#projekty">Projekty</a>
+        <a href="#o-mnie">O stronie</a>
+        <a href="#kontakt">Kontakt</a>
+      </nav>
+      <div class="actions">
+        <button id="themeToggle" class="btn ghost" aria-label="Przełącz motyw (T)">Motyw</button>
+        <a class="btn primary" href="#projekty">Zobacz demo</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section id="start" class="hero">
+      <div class="wrap">
+        <div class="grid">
+          <div>
+            <div class="kicker"><span class="pulse"></span> Edycja 2025</div>
+            <h1 class="title">Zarąbista strona w jednym pliku</h1>
+            <p class="typed" id="typed"></p>
+            <div class="cta">
+              <a class="btn primary" href="#funkcje">Co potrafi?</a>
+              <a class="btn" href="#kontakt">Skontaktuj się</a>
+            </div>
+          </div>
+          <div class="panel" id="panel">
+            <div class="glow"></div>
+            <svg class="decor" viewBox="0 0 600 400" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+              <defs>
+                <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
+                  <stop offset="0" stop-color="var(--primary)" />
+                  <stop offset="1" stop-color="var(--accent)" />
+                </linearGradient>
+              </defs>
+              <g fill="none" stroke="url(#g)" stroke-width="2" opacity="0.8">
+                <path d="M0,300 C100,280 140,200 220,210 C300,220 360,320 450,300 C520,285 560,250 600,260" />
+                <path d="M0,200 C80,190 140,150 230,150 C300,150 350,190 410,195 C500,200 560,180 600,170" />
+                <path d="M0,110 C100,120 160,130 220,120 C300,105 360,90 430,100 C510,110 560,115 600,110" />
+              </g>
+              <g fill="url(#g)" opacity="0.18">
+                <circle cx="120" cy="90" r="8" />
+                <circle cx="340" cy="60" r="10" />
+                <circle cx="520" cy="130" r="7" />
+              </g>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="funkcje">
+      <div class="wrap">
+        <h2 class="section-title">Funkcje na pokładzie</h2>
+        <p class="section-desc">Płynne przewijanie, tryb jasny/ciemny, animowane tło cząsteczek, efekt pisania, karty 3D oraz wejścia treści na scrollu, wszystko bez zależności zewnętrznych.</p>
+        <div class="features">
+          <div class="card">
+            <span class="badge">UI</span>
+            <h3>Motyw i dostępność</h3>
+            <p>Automatyczne wykrywanie preferencji systemowych, przełącznik motywu, kontrastowe kolory i wsparcie klawiatury.</p>
+          </div>
+          <div class="card">
+            <span class="badge">Anim</span>
+            <h3>Żywe animacje</h3>
+            <p>Tło cząsteczek na canvasie, gradientowy nagłówek i subtelne cienie dodają głębi bez spadku wydajności.</p>
+          </div>
+          <div class="card">
+            <span class="badge">Dev</span>
+            <h3>Zero zależności</h3>
+            <p>Czysty HTML, CSS i JS w jednym pliku — łatwo przenieść, skopiować lub hostować statycznie.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="projekty">
+      <div class="wrap">
+        <h2 class="section-title">Interaktywne karty</h2>
+        <p class="section-desc">Karty reagują na ruch kursora lekkim przechyleniem 3D oraz światłem podążającym za myszą.</p>
+        <div class="grid">
+          <article class="proj">
+            <h4>Projekt A</h4>
+            <p>Nowoczesny landing z efektem szkła i gradientem.</p>
+            <div class="tags">
+              <span class="tag">UI</span>
+              <span class="tag">Glass</span>
+              <span class="tag">Gradient</span>
+            </div>
+          </article>
+          <article class="proj">
+            <h4>Projekt B</h4>
+            <p>Portfolio z reveal animacją sekcji i płynnym scrollowaniem.</p>
+            <div class="tags">
+              <span class="tag">Scroll</span>
+              <span class="tag">Reveal</span>
+              <span class="tag">SPA</span>
+            </div>
+          </article>
+          <article class="proj">
+            <h4>Projekt C</h4>
+            <p>Wizualne efekty na canvasie i parallax.</p>
+            <div class="tags">
+              <span class="tag">Canvas</span>
+              <span class="tag">Particles</span>
+              <span class="tag">Parallax</span>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="o-mnie">
+      <div class="wrap about">
+        <div>
+          <h2 class="section-title">O tej stronie</h2>
+          <p class="section-desc">To lekki, responsywny szablon pokazujący praktyczne wzorce interakcji i animacji, gotowy jako baza do rozbudowy.</p>
+          <div class="card in">
+            <h3>Dlaczego jednoplikowo?</h3>
+            <p>Migruje się błyskawicznie, łatwo zademonstrować na dowolnym hostingu lub wkleić w edytor bez konfiguracji.</p>
+          </div>
+        </div>
+        <div class="card in">
+          <h3>Skróty klawiaturowe</h3>
+          <p>Wciśnij T, aby przełączyć motyw; wciśnij G, aby płynnie przewinąć do sekcji Funkcje.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="kontakt" class="contact">
+      <div class="wrap">
+        <h2 class="section-title">Kontakt</h2>
+        <p class="section-desc">Formularz jest przykładam klientowym — można podpiąć mailto:, webhook lub backend według potrzeb.</p>
+        <form id="contactForm" autocomplete="on">
+          <div class="row">
+            <div>
+              <label>Imię
+                <input name="name" placeholder="Jan" required />
+              </label>
+            </div>
+            <div>
+              <label>Email
+                <input name="email" type="email" placeholder="jan@example.com" required />
+              </label>
+            </div>
+          </div>
+          <label>Wiadomość
+            <textarea name="msg" placeholder="Cześć! Napisz, co chcesz zbudować..." required></textarea>
+          </label>
+          <button type="submit" class="btn primary send">Wyślij</button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <div>© 2025 OneFile Pro • Zrobione z pasją i czystym JS</div>
+    </div>
+  </footer>
+
+  <script>
+    // Preferencje motywu (system / lokalne)
+    const root = document.documentElement;
+    const prefersDark = matchMedia('(prefers-color-scheme: dark)');
+    const applyTheme = (t) => root.setAttribute('data-theme', t);
+    const saved = localStorage.getItem('theme');
+    applyTheme(saved ?? (prefersDark.matches ? 'dark' : 'light'));
+    prefersDark.addEventListener('change', e => {
+      if (!localStorage.getItem('theme')) applyTheme(e.matches ? 'dark' : 'light');
+    });
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      applyTheme(next);
+      localStorage.setItem('theme', next);
+    });
+    window.addEventListener('keydown', (e) => {
+      if (e.key.toLowerCase() === 't') document.getElementById('themeToggle').click();
+      if (e.key.toLowerCase() === 'g') document.querySelector('a[href="#funkcje"]').click();
+    });
+
+    // Płynne przewijanie
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', (e) => {
+        const id = a.getAttribute('href');
+        const el = document.querySelector(id);
+        if (!el) return;
+        e.preventDefault();
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        history.pushState(null, '', id);
+      });
+    });
+
+    // Typed effect
+    (function typed() {
+      const el = document.getElementById('typed');
+      const lines = [
+        'Zero zależności. Maksimum efektu.',
+        'Tryb jasny / ciemny i płynne animacje.',
+        'Canvas particles + karty 3D + reveal.',
+      ];
+      let li = 0, ci = 0, erase = false, pause = 0;
+      function tick() {
+        if (pause > 0) { pause--; return requestAnimationFrame(tick); }
+        const target = lines[li];
+        if (!erase) {
+          ci++;
+          el.textContent = target.slice(0, ci);
+          if (ci >= target.length) { erase = true; pause = 30; }
+        } else {
+          ci--;
+          el.textContent = target.slice(0, ci);
+          if (ci <= 0) { erase = false; li = (li + 1) % lines.length; pause = 12; }
+        }
+        setTimeout(() => requestAnimationFrame(tick), erase ? 24 : 30);
+      }
+      tick();
+    })();
+
+    // Reveal on scroll
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) e.target.classList.add('in');
+      });
+    }, { threshold: 0.14 });
+    document.querySelectorAll('.card').forEach(el => io.observe(el));
+
+    // Karty przechylane 3D
+    function attachTilt(el) {
+      el.addEventListener('mousemove', (e) => {
+        const r = el.getBoundingClientRect();
+        const x = (e.clientX - r.left) / r.width;
+        const y = (e.clientY - r.top) / r.height;
+        const rx = (y - 0.5) * -8;
+        const ry = (x - 0.5) * 10;
+        el.style.setProperty('--rx', rx.toFixed(2) + 'deg');
+        el.style.setProperty('--ry', ry.toFixed(2) + 'deg');
+      });
+      el.addEventListener('mouseleave', () => {
+        el.style.removeProperty('--rx');
+        el.style.removeProperty('--ry');
+      });
+    }
+    document.querySelectorAll('.proj').forEach(attachTilt);
+
+    // Panel glow parallax
+    (function panelGlow() {
+      const p = document.getElementById('panel');
+      const glow = p.querySelector('.glow');
+      p.addEventListener('mousemove', (e) => {
+        const r = p.getBoundingClientRect();
+        const mx = ((e.clientX - r.left) / r.width) * 100;
+        const my = ((e.clientY - r.top) / r.height) * 100;
+        glow.style.setProperty('--mx', mx + '%');
+        glow.style.setProperty('--my', my + '%');
+      });
+    })();
+
+    // Canvas particles background
+    (function particles() {
+      const c = document.getElementById('bg');
+      const ctx = c.getContext('2d', { alpha: true });
+      let DPR = Math.max(1, Math.min(2, devicePixelRatio || 1));
+      let W, H, N, P = [];
+      function resize() {
+        W = c.width = Math.floor(innerWidth * DPR);
+        H = c.height = Math.floor((innerHeight * 0.7) * DPR);
+        c.style.height = Math.floor(innerHeight * 0.7) + 'px';
+        c.style.width = '100%';
+        N = Math.floor((W * H) / (11000 * DPR * DPR));
+        P = Array.from({ length: N }, () => ({
+          x: Math.random() * W,
+          y: Math.random() * H,
+          vx: (Math.random() - 0.5) * 0.3 * DPR,
+          vy: (Math.random() - 0.5) * 0.3 * DPR,
+          r: Math.random() * (1.6 * DPR) + (0.6 * DPR),
+        }));
+      }
+      resize();
+      addEventListener('resize', resize);
+
+      function color() {
+        const styles = getComputedStyle(document.documentElement);
+        const a = styles.getPropertyValue('--accent').trim();
+        const p = styles.getPropertyValue('--primary').trim();
+        return { a, p };
+      }
+
+      function step() {
+        const { a, p } = color();
+        ctx.clearRect(0, 0, W, H);
+        for (let i = 0; i < P.length; i++) {
+          const o = P[i];
+          o.x += o.vx; o.y += o.vy;
+          if (o.x < -50 || o.x > W + 50) o.vx *= -1;
+          if (o.y < -50 || o.y > H + 50) o.vy *= -1;
+          ctx.beginPath();
+          ctx.arc(o.x, o.y, o.r, 0, Math.PI * 2);
+          ctx.fillStyle = i % 2 ? a + '40' : p + '40';
+          ctx.fill();
+        }
+        // linki
+        for (let i = 0; i < P.length; i++) {
+          for (let j = i + 1; j < P.length; j++) {
+            const dx = P[i].x - P[j].x;
+            const dy = P[i].y - P[j].y;
+            const d2 = dx * dx + dy * dy;
+            const max = 120 * DPR;
+            if (d2 < max * max) {
+              const alpha = 1 - Math.sqrt(d2) / max;
+              ctx.beginPath();
+              ctx.moveTo(P[i].x, P[i].y);
+              ctx.lineTo(P[j].x, P[j].y);
+              ctx.strokeStyle = a + Math.max(20, Math.floor(alpha * 90)).toString(16);
+              ctx.lineWidth = 0.8 * DPR;
+              ctx.stroke();
+            }
+          }
+        }
+        requestAnimationFrame(step);
+      }
+      step();
+    })();
+
+    // Formularz (demo)
+    document.getElementById('contactForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(e.currentTarget).entries());
+      alert(`Dzięki! Oto podgląd:\n\nImię: ${data.name}\nEmail: ${data.email}\nWiadomość: ${data.msg}`);
+      e.currentTarget.reset();
+    });
+
+    // Usprawnienie fokusu dla mysz/klawiatura
+    let usingMouse = false;
+    addEventListener('mousedown', () => { usingMouse = true; document.body.classList.add('mouse'); }, { passive: true });
+    addEventListener('keydown', () => { if (usingMouse) { usingMouse = false; document.body.classList.remove('mouse'); } });
+  </script>
+</body>
+</html>
